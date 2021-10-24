@@ -1,0 +1,102 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+td, th {
+  border: 1px solid #303030;
+  text-align: right;
+  padding: 8px;
+}
+
+/* tr:nth-child(even) {
+  background-color: #dddddd;
+} */
+
+.feedback{
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  border: 0.1rem #0373fc solid;
+}
+
+.h-f{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+.h-f-h{
+  width: 5rem;
+  height: 2.3rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #0373fc;
+  color: #f9f9f9;
+}
+
+.f-h{
+  width: 5rem;
+  height: 2.3rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.cell{
+  width: calc(25%);
+  height: 1.5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 0.1px #303030 solid;
+  position: relative;
+}
+
+.num{
+  font-size: 12px;
+  position: absolute;
+  bottom: 0;
+  right: 3px;
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
