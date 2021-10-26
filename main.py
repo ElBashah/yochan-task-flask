@@ -3,11 +3,12 @@ from firebase_admin import credentials, firestore, initialize_app
 # Ini
 from flask import request, render_template
 from markupsafe import Markup
+import datetime
 
 app = Flask(__name__)
 
 # Firebase init
-cred = credentials.Certificate('yochan-task-firebase-adminsdk-d52w6-1e0c5c8849.json')
+cred = credentials.Certificate('firebaseConfig.json')
 default_app = initialize_app(cred)
 db = firestore.client()
 feedbacks_ref = db.collection('feedbacks')
@@ -44,7 +45,6 @@ robot += 'viewBox="0 0 640 512" height="1em" width="1em" xmlns="http://www.w3.or
 robot += '<path d="M32,224H64V416H32A31.96166,31.96166,0,0,1,0,384V256A31.96166,31.96166,0,0,1,32,224Zm512-48V448a64.06328,64.06328,0,0,1-64,64H160a64.06328,64.06328,0,0,1-64-64V176a79.974,79.974,0,0,1,80-80H288V32a32,32,0,0,1,64,0V96H464A79.974,79.974,0,0,1,544,176ZM264,256a40,40,0,1,0-40,40A39.997,39.997,0,0,0,264,256Zm-8,128H192v32h64Zm96,0H288v32h64ZM456,256a40,40,0,1,0-40,40A39.997,39.997,0,0,0,456,256Zm-8,128H384v32h64ZM640,256V384a31.96166,31.96166,0,0,1-32,32H576V224h32A31.96166,31.96166,0,0,1,640,256Z">'
 robot += '</path></svg>'
 
-# current_state = 1
 feedback = {'c1': 0, 'c2': 0, 'c3': 0, 'c4': 0, 'c5': 3, 'c6': 0, 'c7': 0, 'current': 1, 'previous': 1 }
 user = {'name': "Turki", 'email': ""}
 
@@ -75,12 +75,12 @@ def getState(state):
         return Markup('<div>&nbsp;</div>')
 
 
-def add():
-    print("\nCLICKED\n")
-    return redirect(url_for('page2'))
-
-@app.route('/page2')
+@app.route('/page2',  methods=['POST', 'GET'])
 def page2():
+
+    if request.method == 'POST':
+        user['email'] = request.form['email']
+        user['name'] = request.form['name']
 
     opr = request.args.get('opr')
     if opr == 'next':
@@ -111,38 +111,39 @@ def page2():
                 feedback['c' + str(feedback['current'])] = -1
                 feedback['previous'] = feedback['current']
         
-        
-    # return "Success"
-    print("\n[OPR]: ", opr)
-    print("\nNEW FEEDBACK: ", feedback)
     return render_template('page2.html', getState=getState, next=next, current_state=feedback['current'], url_for=url_for)
 
 
 @app.route('/page3')
 def page3():
 
+    # Uploading to firestore
+    ref = feedbacks_ref.document()
+    ref.set({'feedback_id': ref.id, 'date': datetime.datetime.now(), 'name': user['name'], 'c1': feedback['c1'], 'c2': feedback['c2'], 'c3': feedback['c3'], 'c4': feedback['c4'], 'c5': feedback['c5'], 'c6': feedback['c6'], 'c7': feedback['c7'], 'email': user['email']})
 
-    feedback_id = 'gJrsBzRD5Kkadd6JSE95'
+    # Reading back the document just uploaded
+    feedback_id = ref.id
     feedback_doc = feedbacks_ref.document(feedback_id).get()
     feedback_data = feedback_doc.to_dict()
 
     return render_template('page3.html', feedback=feedback_data)
 
+@app.errorhandler(404)
+def page_not_found(e):
+    return redirect(url_for('page1'))
+
+
+@app.route('/page1')
+def page1():
+    return render_template('login.html', add=add, url_for=url_for)
+
 @app.route('/')
 def main():
     print(app)
-    # return Markup(html)
-    return render_template('login.html', add=add, url_for=url_for)
+    return redirect(url_for('page1'))
 
-
-
-
-# app.jinja_env.globals.update(add=add)
 
 if __name__ == '__main__':
- 
-    # run() method of Flask class runs the application
-    # on the local development server.
     app.run(host='localhost', port=5055)
 
         
