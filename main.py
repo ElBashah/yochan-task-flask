@@ -1,11 +1,19 @@
-from flask import Flask
-from flask import request
+from flask import Flask , redirect, url_for, request, jsonify
+from firebase_admin import credentials, firestore, initialize_app
+# Ini
+from flask import request, render_template
 from markupsafe import Markup
 
 app = Flask(__name__)
 
-def Button(width, text):
-    return Markup('<input style="width:{}rem" type="button" class="button" value="{}" />'.format(width, text))
+# Firebase init
+cred = credentials.Certificate('yochan-task-firebase-adminsdk-d52w6-1e0c5c8849.json')
+default_app = initialize_app(cred)
+db = firestore.client()
+feedbacks_ref = db.collection('feedbacks')
+
+def Button(width, text, click):
+    return Markup('<button style="width:{}rem" type="button" class="button" value="{}" onclick="window.location.href=" url_for( "page2") " > TEST <button/>'.format(width, text))
 
 def TextBox(id):
     return Markup(' <div class="text-box"> <input class="text-box-inner" type="text" id="{}" /></div>'.format(id))
@@ -17,7 +25,7 @@ def LoginPage():
     res += '<div style=" flex-direction: row; margin-top: 1rem;"> <div style="font-size: 20px;">Name: </div>'
     res += '{}</div>'.format(TextBox("username"))
     res += '<div style="margin-top: 1rem;">'
-    res += '{}</div></div>'.format(Button(8, "Login"))
+    res += '{}</div></div>'.format(Button(8, "Login", ""))
     return Markup(res)
 
 html = "<html>"
@@ -26,10 +34,151 @@ html += '<body class="">{}'.format(LoginPage())
 html += '</body>'
 html += "</html>"
 
+home = '<svg stroke="currentColor" fill="currentColor" stroke-width="0"'
+home += 'viewBox="0 0 576 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"> '
+home += '<path d="M280.37 148.26L96 300.11V464a16 16 0 0 0 16 16l112.06-.29a16 16 0 0 0 15.92-16V368a16 16 0 0 1 16-16h64a16 16 0 0 1 16 16v95.64a16 16 0 0 0 16 16.05L464 480a16 16 0 0 0 16-16V300L295.67 148.26a12.19 12.19 0 0 0-15.3 0zM571.6 251.47L488 182.56V44.05a12 12 0 0 0-12-12h-56a12 12 0 0 0-12 12v72.61L318.47 43a48 48 0 0 0-61 0L4.34 251.47a12 12 0 0 0-1.6 16.9l25.5 31A12 12 0 0 0 45.15 301l235.22-193.74a12.19 12.19 0 0 1 15.3 0L530.9 301a12 12 0 0 0 16.9-1.6l25.5-31a12 12 0 0 0-1.7-16.93z">'
+home += '</path> </svg>'
+
+robot = '<svg stroke="currentColor" fill="currentColor" stroke-width="0"'
+robot += 'viewBox="0 0 640 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">'
+robot += '<path d="M32,224H64V416H32A31.96166,31.96166,0,0,1,0,384V256A31.96166,31.96166,0,0,1,32,224Zm512-48V448a64.06328,64.06328,0,0,1-64,64H160a64.06328,64.06328,0,0,1-64-64V176a79.974,79.974,0,0,1,80-80H288V32a32,32,0,0,1,64,0V96H464A79.974,79.974,0,0,1,544,176ZM264,256a40,40,0,1,0-40,40A39.997,39.997,0,0,0,264,256Zm-8,128H192v32h64Zm96,0H288v32h64ZM456,256a40,40,0,1,0-40,40A39.997,39.997,0,0,0,456,256Zm-8,128H384v32h64ZM640,256V384a31.96166,31.96166,0,0,1-32,32H576V224h32A31.96166,31.96166,0,0,1,640,256Z">'
+robot += '</path></svg>'
+
+# current_state = 1
+feedback = {'c1': 0, 'c2': 0, 'c3': 0, 'c4': 0, 'c5': 3, 'c6': 0, 'c7': 0, 'current': 1, 'previous': 1 }
+user = {'name': "Turki", 'email': ""}
+
+@app.route('/next', methods = ['GET'])
+def next():
+    return redirect(url_for('page2', opr='next', state=feedback['current']))
+
+@app.route('/back', methods = ['GET'])
+def back():
+    return redirect(url_for('page2', opr='back', state=feedback['current']))
+
+@app.route('/add', methods = ['GET'])
+def add():
+    return redirect(url_for('page2', opr='add', state=feedback['current']))
+
+@app.route('/sub', methods = ['GET'])
+def sub():
+    return redirect(url_for('page2', opr='sub', state=feedback['current']))
+
+def getState(state):
+    if state == 7 and state != feedback['current']:
+        return Markup(home)
+
+    elif state == feedback['current']:
+        return Markup(robot)
+    
+    else:
+        return Markup('<div>&nbsp;</div>')
+
+
+def add():
+    print("\nCLICKED\n")
+    return redirect(url_for('page2'))
+
+@app.route('/page2')
+def page2():
+
+    opr = request.args.get('opr')
+    if opr == 'next':
+        state = int(request.args.get('state'))
+        feedback['previous'] = state
+        if state > 0 and state < 7:
+            state += 1
+            feedback['current'] = state
+
+    elif opr == 'back':
+        state = int(request.args.get('state'))
+        feedback['previous'] = state
+        if state > 1 and state < 7:
+            state -= 1
+            feedback['current'] = state
+
+    elif opr == 'add' or opr == 'sub':
+        if feedback['previous'] == feedback['current']:
+            if opr == 'add':
+                feedback['c' + str(feedback['current'])] += 1
+            else:
+                feedback['c' + str(feedback['current'])] -= 1
+        else:
+            if opr == 'add':
+                feedback['c' + str(feedback['current'])] = 1
+                feedback['previous'] = feedback['current']
+            else:
+                feedback['c' + str(feedback['current'])] = -1
+                feedback['previous'] = feedback['current']
+        
+        
+    # return "Success"
+    print("\n[OPR]: ", opr)
+    print("\nNEW FEEDBACK: ", feedback)
+    return render_template('page2.html', getState=getState, next=next, current_state=feedback['current'], url_for=url_for)
+
+
+@app.route('/page3')
+def page3():
+
+    """
+        create() : Add document to Firestore collection with request body
+        Ensure you pass a custom ID as part of json body in post request
+        e.g. json={'id': '1', 'title': 'Write a blog post'}
+    """
+    # try:
+    #     id = request.json['id']
+    #     todo_ref.document(id).set(request.json)
+    #     return jsonify({"success": True}), 200
+    # except Exception as e:
+    #     return f"An Error Occured: {e}"
+
+    todo_id = 'gJrsBzRD5Kkadd6JSE95'
+    # col = db.collection('feedbacks').document('gJrsBzRD5Kkadd6JSE95').get()
+    todo = feedbacks_ref.document(todo_id).get()
+    m = todo.to_dict()
+    # l = jsonify(col)
+    all = []
+    # for i in col:
+    #     all.append(jsonify(i.to_dict()))
+    print("\n LIST:: ", m)
+
+    return render_template('page3.html', feedback=feedback, user=user)
+
+# @app.route('/list', methods=['GET'])
+# def read():
+#     """
+#         read() : Fetches documents from Firestore collection as JSON
+#         todo : Return document that matches query ID
+#         all_todos : Return all documents
+#     """
+#     try:
+#         # Check if ID was passed to URL query
+#         todo_id = request.args.get('id')    
+#         if todo_id:
+#             todo = todo_ref.document(todo_id).get()
+#             return jsonify(todo.to_dict()), 200
+#         else:
+#             all_todos = [doc.to_dict() for doc in todo_ref.stream()]
+#             return jsonify(all_todos), 200
+#     except Exception as e:
+#         return f"An Error Occured: {e}"
+
 @app.route('/')
 def main():
-    return Markup(html)
+    print(app)
+    # return Markup(html)
+    return render_template('login.html', add=add, url_for=url_for)
 
 
+
+
+# app.jinja_env.globals.update(add=add)
+
+if __name__ == '__main__':
+ 
+    # run() method of Flask class runs the application
+    # on the local development server.
+    app.run(host='localhost', port=5055)
 
         

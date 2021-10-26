@@ -68,6 +68,13 @@ td, th {
   font-size: 20px;
 }
 
+a:link {
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: none;
+}
+
 .text-box{
   width: 17rem;
   height: 1.5rem;
@@ -105,7 +112,7 @@ td, th {
 
 .cell{
   width: calc(25%);
-  height: 1.5;
+  height: 1.5rem;
   display: flex;
   justify-content: center;
   align-items: center;

@@ -1,0 +1,72 @@
+<html>
+
+<head>
+    <link rel="stylesheet" type="text/css" href="./static/styles/App.css">
+
+    <script type=text/javascript>
+        let state = localStorage.getItem('feedback');
+        let feedback = {'c1': 0, 'c2': 0, 'c3': 0, 'c4': 0, 'c5': 0, 'c6': 0, 'c7': 0, 'current': 1 }
+        if(!state)
+            localStorage.setItem('feedback', JSON.stringify(feedback))
+        else
+            feedback = JSON.parse(state)
+    </script>
+</head>
+
+<body class="">
+    <div
+        style="width: 100%; height: 100%; display: flex; justify-content: flex-start; align-items: flex-start; flex-direction: column; padding: 2rem;">
+
+
+        <div style="display: flex; flex-direction: row; margin-top: 3rem;">
+            <div style="color: rgb(50, 168, 82); --darkreader-inline-color:#a6e09a;" data-darkreader-inline-color="">
+                <b>Your feedback has been recorded successfully</b>
+            </div>
+        </div>
+
+
+        <div style="display: flex; flex-direction: row; margin-top: 0.5rem;">
+            <div><b>Feedback reference no: </b>gJrsBzRD5Kkadd6JSE95</div>
+        </div>
+
+        <div style="display: flex; flex-direction: row; margin-top: 1rem;">
+            <div><b>Name:&nbsp;&nbsp;</b></div>
+            <div>{{user.name}}</div>
+        </div>
+
+        <div style="display: flex; flex-direction: row; margin-top: 1rem;">
+            <div><b>Email:&nbsp;&nbsp;</b></div>
+            <div>{{user.email}}</div>
+        </div>
+
+        <div style="display: flex; flex-direction: row; margin-top: 2rem;">
+            <div><b>Your feedback</b></div>
+        </div>
+
+
+        <div class="feedback">
+            <div class="h-f">
+                <div class="h-f-h">STATE 1</div>
+                <div class="h-f-h">STATE 2</div>
+                <div class="h-f-h">STATE 3</div>
+                <div class="h-f-h">STATE 4</div>
+                <div class="h-f-h">STATE 5</div>
+                <div class="h-f-h">STATE 6</div>
+                <div class="h-f-h">STATE 7</div>
+            </div>
+            <div class="h-f">
+                <div class="f-h">{{feedback.c1}}</div>
+                <div class="f-h">{{feedback.c2}}</div>
+                <div class="f-h">{{feedback.c3}}</div>
+                <div class="f-h">{{feedback.c4}}</div>
+                <div class="f-h">{{feedback.c5}}</div>
+                <div class="f-h">{{feedback.c6}}</div>
+                <div class="f-h">{{feedback.c7}}</div>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+
+</html>
