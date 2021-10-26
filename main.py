@@ -144,6 +144,7 @@ def main():
 
 
 if __name__ == '__main__':
-    app.run(host='localhost', port=5055)
+    # app.run(host='localhost', port=5055)
+    app.run(threaded=True, port=5000)
 
         
