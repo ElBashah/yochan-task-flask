@@ -121,48 +121,12 @@ def page2():
 @app.route('/page3')
 def page3():
 
-    """
-        create() : Add document to Firestore collection with request body
-        Ensure you pass a custom ID as part of json body in post request
-        e.g. json={'id': '1', 'title': 'Write a blog post'}
-    """
-    # try:
-    #     id = request.json['id']
-    #     todo_ref.document(id).set(request.json)
-    #     return jsonify({"success": True}), 200
-    # except Exception as e:
-    #     return f"An Error Occured: {e}"
 
-    todo_id = 'gJrsBzRD5Kkadd6JSE95'
-    # col = db.collection('feedbacks').document('gJrsBzRD5Kkadd6JSE95').get()
-    todo = feedbacks_ref.document(todo_id).get()
-    m = todo.to_dict()
-    # l = jsonify(col)
-    all = []
-    # for i in col:
-    #     all.append(jsonify(i.to_dict()))
-    print("\n LIST:: ", m)
+    feedback_id = 'gJrsBzRD5Kkadd6JSE95'
+    feedback_doc = feedbacks_ref.document(feedback_id).get()
+    feedback_data = feedback_doc.to_dict()
 
-    return render_template('page3.html', feedback=feedback, user=user)
-
-# @app.route('/list', methods=['GET'])
-# def read():
-#     """
-#         read() : Fetches documents from Firestore collection as JSON
-#         todo : Return document that matches query ID
-#         all_todos : Return all documents
-#     """
-#     try:
-#         # Check if ID was passed to URL query
-#         todo_id = request.args.get('id')    
-#         if todo_id:
-#             todo = todo_ref.document(todo_id).get()
-#             return jsonify(todo.to_dict()), 200
-#         else:
-#             all_todos = [doc.to_dict() for doc in todo_ref.stream()]
-#             return jsonify(all_todos), 200
-#     except Exception as e:
-#         return f"An Error Occured: {e}"
+    return render_template('page3.html', feedback=feedback_data)
 
 @app.route('/')
 def main():
